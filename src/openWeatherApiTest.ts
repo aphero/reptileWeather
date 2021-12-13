@@ -17,8 +17,9 @@ export async function getLocalWeather(location: Location) {
   const query = `${baseUrl}${addQueryCoords(location)}&units=${UNIT}&appid=${API_KEY}`
 
   console.log('Using query with openWeather API:', query)
-  let maybeRes: AxiosResponse = await axios.get(query).catch(e => {throw new Error(`ERROR: ${e}`)})
-  const weatherData = await coerceWeatherData(maybeRes)
+  let maybeRes: AxiosResponse | null = await axios.get(query).catch(_ => {return null})
+  console.log(maybeRes?.data)
+  const weatherData = await coerceWeatherData(maybeRes?.data)
   
   return weatherData
 }
@@ -29,37 +30,36 @@ function addQueryCoords(location: Location) {
 
 interface ReptileWeather {
   temp: number | string,
-  humidity: number | string
+  humidity: number | string,
+  location: string,
+  windspeed: number | string
+  pressure: number | string
 }
 
-async function coerceWeatherData(data: any): Promise<ReptileWeather> {
-  console.log('Coercing data from API')
-  if (data instanceof Error) {
-    console.log('ERROR DETECTED')
-    return {
-      temp: 'ERROR',
-      humidity: 'ERROR'
-    }
+async function coerceWeatherData(data: any): Promise<ReptileWeather|Error> {
+  if (!data) {
+    console.log('coerceWeatherData> No data returned from openWeather API')
+    return Error('No Data')
   } else {
-    console.log('Returning data')
     try {
+      console.log('Returning data')
       return {
-        temp: data.data.main.temp,
-        humidity: data.data.main.humidity
+        temp: data.main.temp,
+        humidity: data.main.humidity,
+        location: `${data.name}, ${data.sys.country}`,
+        windspeed: data.wind.speed,
+        pressure: data.main.pressure
       }
     } catch(e) {
-      console.log(e)
-      return {
-        temp: 'ERROR',
-        humidity: 'ERROR'
-      }
+      console.log('ERROR:', e)
+      return Error('ERROR: Could not parse data')
     }
   }
 }
 
 interface ReptileData {
   name: string
-  weather: ReptileWeather
+  weather: ReptileWeather | Error
 }
 
 const reptileList = [MissKeter, Clamps, TickTock, Kalira]
