@@ -37,3 +37,9 @@ export const NEW_GUINEA: Location = {
   lat: -9.40,
   lon: 147.15
 }
+
+export const INVALID_COUNTRY: Location = {
+  stationId: 'Nowhere',
+  lat: -180,
+  lon: 56829
+}

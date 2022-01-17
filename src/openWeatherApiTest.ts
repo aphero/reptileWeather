@@ -1,5 +1,5 @@
 import axios, { AxiosResponse } from 'axios';
-import { CRESTED_GECKO, JUNGLE_CARPET_PYTHON, RED_EYED_CROCODILE_SKINK, VEILED_CHAMELEON } from './constants/reptiles';
+import { BAD_TEST_HERP, CRESTED_GECKO, JUNGLE_CARPET_PYTHON, RED_EYED_CROCODILE_SKINK, VEILED_CHAMELEON } from './constants/reptiles';
 import { Fauna, Species } from './data/species';
 import { Location } from './constants/locations'
 
@@ -10,6 +10,7 @@ const MissKeter = new Fauna('Miss Keter', CRESTED_GECKO)
 const Clamps = new Fauna('Francis Clampazzo', VEILED_CHAMELEON)
 const Kalira = new Fauna('Kalira', JUNGLE_CARPET_PYTHON)
 const TickTock = new Fauna('Tick Tock', RED_EYED_CROCODILE_SKINK)
+const BadTestHerp = new Fauna('Dumb Dumb', BAD_TEST_HERP)
 
 export async function getLocalWeather(location: Location) {
   const baseUrl = 'https://api.openweathermap.org/data/2.5/weather?'
@@ -17,7 +18,7 @@ export async function getLocalWeather(location: Location) {
   const query = `${baseUrl}${addQueryCoords(location)}&units=${UNIT}&appid=${API_KEY}`
 
   console.log('Using query with openWeather API:', query)
-  let maybeRes: AxiosResponse | null = await axios.get(query).catch(_ => {return null})
+  let maybeRes: AxiosResponse | null = await axios.get(query)
   console.log(maybeRes?.data)
   const weatherData = await coerceWeatherData(maybeRes?.data)
   
@@ -62,7 +63,7 @@ interface ReptileData {
   weather: ReptileWeather | Error
 }
 
-const reptileList = [MissKeter, Clamps, TickTock, Kalira]
+const reptileList = [MissKeter, Clamps, TickTock, Kalira, BadTestHerp]
 
 async function main() {
   let reptiles: ReptileData[] = []
